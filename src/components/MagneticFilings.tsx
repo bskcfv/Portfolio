@@ -1,32 +1,40 @@
-import { useEffect, useRef, useState } from "react";
-import { animate, stagger } from "motion";
+import { type CSSProperties, useEffect, useMemo, useRef, useState } from "react";
 import { User } from "lucide-react";
 
-// --- INSTRUCCIONES DE PERSONALIZACIÓN ---
-// Puedes guardar tu foto en la ruta de tu proyecto como "assets/profile.jpg" o similar.
-// Si deseas cambiar el nombre o extensión del archivo, edita el valor de abajo:
-const PROFILE_IMAGE_URL = "assets/profile.jpg";
+const PROFILE_IMAGE_URL = new URL("../../assets/profile.jpg", import.meta.url).href;
 
 export default function MagneticFilings() {
   const containerRef = useRef<HTMLDivElement>(null);
-  const [imgSrc, setImgSrc] = useState(PROFILE_IMAGE_URL);
   const [imageError, setImageError] = useState(false);
+  const [isActive, setIsActive] = useState(false);
+
+  const filings = useMemo(() => {
+    return Array.from({ length: 400 }).map((_, i) => {
+      const row = Math.floor(i / 20);
+      const col = i % 20;
+      const dist = Math.sqrt(Math.pow(row - 9.5, 2) + Math.pow(col - 9.5, 2));
+      const isCenter = dist < 5.2;
+
+      return { i, isCenter };
+    });
+  }, []);
 
   useEffect(() => {
-    if (!containerRef.current) return;
-    const filings = containerRef.current.querySelectorAll(".filing");
+    const container = containerRef.current;
+    if (!container) return;
 
-    // Animación radial con stagger para las partículas rotatorias
-    animate(
-      filings,
-      { rotate: [0, 360] },
-      {
-        duration: 5,
-        repeat: Infinity,
-        ease: "easeInOut",
-        delay: stagger(0.015),
-      }
+    if (!('IntersectionObserver' in window)) {
+      setIsActive(true);
+      return;
+    }
+
+    const observer = new IntersectionObserver(
+      ([entry]) => setIsActive(entry.isIntersecting),
+      { rootMargin: '160px 0px' },
     );
+
+    observer.observe(container);
+    return () => observer.disconnect();
   }, []);
 
   return (
@@ -37,22 +45,14 @@ export default function MagneticFilings() {
       {/* Campo de filamentos magnéticos */}
       <div
         ref={containerRef}
-        className="grid grid-cols-[repeat(20,1fr)] grid-rows-[repeat(20,1fr)] w-[300px] h-[300px] sm:w-[400px] sm:h-[400px] gap-1 mx-auto relative z-10"
+        className={`grid grid-cols-[repeat(20,1fr)] grid-rows-[repeat(20,1fr)] w-[300px] h-[300px] sm:w-[400px] sm:h-[400px] gap-1 mx-auto relative z-10 ${isActive ? "magnetic-field-active" : ""}`}
       >
-        {Array.from({ length: 400 }).map((_, i) => {
-          const row = Math.floor(i / 20);
-          const col = i % 20;
-          // Centro exacto de la grilla de 20x20 es (9.5, 9.5)
-          const dist = Math.sqrt(Math.pow(row - 9.5, 2) + Math.pow(col - 9.5, 2));
-          
-          // Ocultar las partículas del área central para abrir espacio al círculo de perfil
-          const isCenter = dist < 5.2;
-
-          return (
+        {filings.map(({ i, isCenter }) => (
             <div
               key={i}
-              className={`filing transition-all duration-300 ${isCenter ? "opacity-0 pointer-events-none" : ""}`}
+              className={`magnetic-filing transition-opacity duration-300 ${isCenter ? "opacity-0 pointer-events-none" : ""}`}
               style={{
+                "--filing-delay": `${i * 15}ms`,
                 width: "1.5px",
                 height: "10px",
                 opacity: isCenter ? 0 : 0.35,
@@ -60,10 +60,9 @@ export default function MagneticFilings() {
                 borderRadius: "1px",
                 boxShadow: "0 0 6px rgba(168, 85, 247, 0.5)",
                 background: "linear-gradient(to bottom, #ffffff, #c084fc)",
-              }}
+              } as CSSProperties}
             />
-          );
-        })}
+        ))}
       </div>
 
       {/* Círculo contenedor de la foto de perfil en el centro */}
@@ -71,8 +70,10 @@ export default function MagneticFilings() {
         
         {!imageError ? (
           <img
-            src={imgSrc}
+            src={PROFILE_IMAGE_URL}
             alt="Cristian Valderrama"
+            loading="lazy"
+            decoding="async"
             className="w-full h-full object-cover select-none transition-transform duration-500 group-hover:scale-105"
             onError={() => setImageError(true)}
             referrerPolicy="no-referrer"

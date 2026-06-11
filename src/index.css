@@ -74,3 +74,40 @@
 .glass-morphism {
   @apply bg-[var(--color-terminal-bg)]/80 backdrop-blur-md border-b border-violet-900/20;
 }
+
+.content-visibility-auto {
+  content-visibility: auto;
+  contain-intrinsic-size: 900px;
+}
+
+.magnetic-filing {
+  transform: rotate(0deg);
+}
+
+.magnetic-field-active .magnetic-filing {
+  animation: magnetic-filing-spin 5s ease-in-out infinite;
+  animation-delay: var(--filing-delay);
+  will-change: transform;
+}
+
+@keyframes magnetic-filing-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    scroll-behavior: auto !important;
+    transition-duration: 0.001ms !important;
+  }
+
+  .magnetic-field-active .magnetic-filing {
+    animation: none;
+    will-change: auto;
+  }
+}

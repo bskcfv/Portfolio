@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import React, { useState, useEffect } from 'react';
+import React, { Suspense, lazy, memo, useCallback, useEffect, useRef, useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { 
   Github, 
@@ -14,20 +14,33 @@ import {
   Briefcase, 
   User, 
   Mail, 
-  ExternalLink,
   ChevronRight,
   Terminal as TerminalIcon,
   Award,
   Globe,
   MapPin,
-  CheckCircle2,
   X
 } from 'lucide-react';
 import { cn } from './lib/utils';
 import DonutASCII from './components/DonutASCII';
-import MagneticFilings from './components/MagneticFilings';
 
 // --- Components & Translations ---
+
+const APP_NAME = 'Portfolio CV';
+const MagneticFilings = lazy(() => import('./components/MagneticFilings'));
+
+const localAssets = {
+  cv: new URL('../assets/Currículum Vitae CV Valderrama Cabezas Cristian Felipe.pdf', import.meta.url).href,
+  certificadoProgramacionPrincipiante: new URL('../assets/certificadoProgramacionPrincipiante.jpg', import.meta.url).href,
+  certificadoJavaPoo: new URL('../assets/certificadoJavaPoo.JPG', import.meta.url).href,
+  certificadoGit: new URL('../assets/certificadoGIT.jpg', import.meta.url).href,
+  certificadoDesarrolloPersonal: new URL('../assets/certificadoDesarrolloPersonal.jpg', import.meta.url).href,
+  certificadoAnalisisDatos: new URL('../assets/certificadoAnalisisdeDatos.jpg', import.meta.url).href,
+  badgeQueryOpt: new URL('../assets/badgeQueryOpt.png', import.meta.url).href,
+  badgeCrud: new URL('../assets/badgeCrud.png', import.meta.url).href,
+  badgeRelationalModel: new URL('../assets/badgeRelationalModel.png', import.meta.url).href,
+  badgeBuildinGenAI: new URL('../assets/badgeBuildinGenAI.png', import.meta.url).href,
+};
 
 const SectionTitle = ({ children, icon: Icon }: { children: React.ReactNode, icon?: any }) => (
   <motion.div 
@@ -42,6 +55,38 @@ const SectionTitle = ({ children, icon: Icon }: { children: React.ReactNode, ico
       {children}
     </h2>
   </motion.div>
+);
+
+const TypingText = memo(function TypingText({ text }: { text: string }) {
+  const [typingText, setTypingText] = useState('');
+
+  useEffect(() => {
+    setTypingText('');
+    let index = 0;
+    const interval = window.setInterval(() => {
+      if (index <= text.length) {
+        setTypingText(text.slice(0, index));
+        index += 1;
+      } else {
+        window.clearInterval(interval);
+      }
+    }, 35);
+
+    return () => window.clearInterval(interval);
+  }, [text]);
+
+  return (
+    <>
+      {typingText}
+      <span className="cursor ml-1" />
+    </>
+  );
+});
+
+const MagneticFallback = () => (
+  <div className="w-[300px] h-[300px] sm:w-[400px] sm:h-[400px] flex items-center justify-center">
+    <div className="w-[145px] h-[145px] sm:w-[185px] sm:h-[185px] rounded-full border-2 border-violet-500/30 bg-black/50 shadow-[0_0_25px_rgba(168,85,247,0.2)]" />
+  </div>
 );
 
 const translations = {
@@ -229,8 +274,7 @@ const Navbar = ({ lang, setLang }: { lang: 'es' | 'en', setLang: (l: 'es' | 'en'
       )}>
         <div className="max-w-7xl mx-auto flex items-center justify-between">
           <a href="#" className="font-mono text-xl font-bold text-white group">
-            <span className="text-violet-500">$</span> Cristian
-            <span className="text-violet-500 opacity-0 group-hover:opacity-100 transition-opacity">.dev</span>
+            <span className="text-violet-500">$</span> {APP_NAME}
           </a>
 
           <div className="hidden md:flex items-center gap-6">
@@ -320,7 +364,7 @@ const Navbar = ({ lang, setLang }: { lang: 'es' | 'en', setLang: (l: 'es' | 'en'
   );
 };
 
-const ProjectCard = ({ project, index, lang }: { project: any, index: number, lang: 'es' | 'en', key?: any }) => (
+const ProjectCard = memo(({ project, index, lang }: { project: any, index: number, lang: 'es' | 'en', key?: any }) => (
   <motion.div
     initial={{ opacity: 0, y: 30 }}
     whileInView={{ opacity: 1, y: 0 }}
@@ -363,9 +407,9 @@ const ProjectCard = ({ project, index, lang }: { project: any, index: number, la
       {lang === 'es' ? 'Ver Código' : 'View Source'}
     </a>
   </motion.div>
-);
+));
 
-const ExperienceItem = ({ exp, index }: { exp: any, index: number, key?: any }) => (
+const ExperienceItem = memo(({ exp, index }: { exp: any, index: number, key?: any }) => (
   <div className="relative pl-8 pb-12 last:pb-0 border-l border-violet-900/30 ml-4 group">
     <div className="absolute left-[-5px] top-0 w-2.5 h-2.5 bg-violet-500 rounded-full group-hover:scale-150 transition-transform duration-300 shadow-[0_0_10px_var(--color-violet-glow)]" />
     
@@ -383,9 +427,9 @@ const ExperienceItem = ({ exp, index }: { exp: any, index: number, key?: any }) 
       </div>
     </motion.div>
   </div>
-);
+));
 
-const SkillCard = ({ category, items, showLevels = true, lang }: { category: string, items: any[], showLevels?: boolean, lang: 'es' | 'en', key?: any }) => {
+const SkillCard = memo(({ category, items, showLevels = true, lang }: { category: string, items: any[], showLevels?: boolean, lang: 'es' | 'en', key?: any }) => {
   const displayCategory = skillCategoryNames[lang][category as keyof typeof skillCategoryNames['en']] || category;
 
   return (
@@ -408,7 +452,7 @@ const SkillCard = ({ category, items, showLevels = true, lang }: { category: str
                 {skill.iconComponent ? (
                   <skill.iconComponent size={24} className="group-hover:scale-110 transition-transform" />
                 ) : (
-                  <img src={skill.icon} alt={skill.name} className="w-6 h-6 object-contain" />
+                  <img src={skill.icon} alt={skill.name} loading="lazy" decoding="async" className="w-6 h-6 object-contain" />
                 )}
               </div>
               <div className="flex-grow">
@@ -419,10 +463,10 @@ const SkillCard = ({ category, items, showLevels = true, lang }: { category: str
                 {showLevels && skill.level && (
                   <div className="w-full h-1 bg-white/5 rounded-full overflow-hidden">
                      <motion.div 
-                       initial={{ width: 0 }}
-                       whileInView={{ width: skill.level === 'Advanced' ? '75%' : skill.level === 'Intermediate' ? '65%' : '35%' }}
+                       initial={{ scaleX: 0 }}
+                       whileInView={{ scaleX: skill.level === 'Advanced' ? 0.75 : skill.level === 'Intermediate' ? 0.65 : 0.35 }}
                        transition={{ duration: 1, delay: 0.2 }}
-                       className="h-full bg-violet-600 shadow-[0_0_8px_var(--color-violet-glow)]" 
+                       className="h-full origin-left bg-violet-600 shadow-[0_0_8px_var(--color-violet-glow)]" 
                      />
                   </div>
                 )}
@@ -433,9 +477,9 @@ const SkillCard = ({ category, items, showLevels = true, lang }: { category: str
       </div>
     </motion.div>
   );
-};
+});
 
-const CertCard = ({ cert, onClick, lang }: { cert: any, onClick: () => void, lang: 'es' | 'en', key?: any }) => (
+const CertCard = memo(({ cert, onClick, lang }: { cert: any, onClick: () => void, lang: 'es' | 'en', key?: any }) => (
   <motion.div
     whileHover={{ y: -5 }}
     onClick={onClick}
@@ -452,7 +496,7 @@ const CertCard = ({ cert, onClick, lang }: { cert: any, onClick: () => void, lan
       {cert.type === 'badge' ? (lang === 'es' ? 'Ver Insignia' : 'View Badge') : (lang === 'es' ? 'Ver Certificado' : 'View Certification')}
     </button>
   </motion.div>
-);
+));
 
 const NeonIcon = ({ size = 24, className = "" }: { size?: number, className?: string }) => (
   <svg width={size} height={size} viewBox="0 0 128 128" className={className}>
@@ -462,35 +506,43 @@ const NeonIcon = ({ size = 24, className = "" }: { size?: number, className?: st
 
 export default function App() {
   const [lang, setLang] = useState<'es' | 'en'>('es');
-  const [typingText, setTypingText] = useState('');
   const [selectedCert, setSelectedCert] = useState<any>(null);
+  const [showMagneticFilings, setShowMagneticFilings] = useState(false);
+  const magneticContainerRef = useRef<HTMLDivElement>(null);
 
   const t = translations[lang];
 
   useEffect(() => {
-    let index = 0;
-    const roleText = t.hero.roleText;
-    setTypingText('');
-    const interval = setInterval(() => {
-      if (index <= roleText.length) {
-        setTypingText(roleText.slice(0, index));
-        index++;
-      } else {
-        clearInterval(interval);
-      }
-    }, 25);
-    return () => clearInterval(interval);
-  }, [lang]);
+    const container = magneticContainerRef.current;
+    if (!container || showMagneticFilings) return;
 
-  const handleDownloadCV = () => {
-    const fileUrl = "assets/Currículum Vitae CV Valderrama Cabezas Cristian Felipe.pdf";
+    if (!('IntersectionObserver' in window)) {
+      setShowMagneticFilings(true);
+      return;
+    }
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setShowMagneticFilings(true);
+          observer.disconnect();
+        }
+      },
+      { rootMargin: '300px 0px' },
+    );
+
+    observer.observe(container);
+    return () => observer.disconnect();
+  }, [showMagneticFilings]);
+
+  const handleDownloadCV = useCallback(() => {
     const a = document.createElement("a");
-    a.href = fileUrl;
+    a.href = localAssets.cv;
     a.download = "Currículum Vitae CV Valderrama Cabezas Cristian Felipe.pdf";
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
-  };
+  }, []);
 
   const experience = {
     es: [
@@ -552,26 +604,26 @@ export default function App() {
 
   const certifications = {
     es: [
-      { title: "Programación G9", issuer: "Alura Latam", date: "Sep 2025", image: "assets/certificadoProgramacionPrincipiante.jpg" },
-      { title: "Programación Java POO", issuer: "Alura Latam", date: "Feb 2026", image: "assets/certificadoJavaPoo.JPG" },
-      { title: "Git & GitHub", issuer: "Crehana", date: "Abr 2025", image: "assets/certificadoGIT.jpg" },
-      { title: "Desarrollo Personal", issuer: "Alura", date: "Sep 2025", image: "assets/certificadoDesarrolloPersonal.jpg" },
-      { title: "Análisis de Datos", issuer: "SENA", date: "Oct 2025", image: "assets/certificadoAnalisisdeDatos.jpg" },
-      { title: "Query Optimization", issuer: "MongoDB University", date: "Insignia", type: 'badge', image: "assets/badgeQueryOpt.png" },
-      { title: "CRUD Operations", issuer: "MongoDB University", date: "Insignia", type: 'badge', image: "assets/badgeCrud.png" },
-      { title: "Relational → Document", issuer: "MongoDB University", date: "Insignia", type: 'badge', image: "assets/badgeRelationalModel.png" },
-      { title: "Building GenAI Apps", issuer: "MongoDB University", date: "Insignia", type: 'badge', image: "assets/badgeBuildinGenAI.png" },
+      { title: "Programación G9", issuer: "Alura Latam", date: "Sep 2025", image: localAssets.certificadoProgramacionPrincipiante },
+      { title: "Programación Java POO", issuer: "Alura Latam", date: "Feb 2026", image: localAssets.certificadoJavaPoo },
+      { title: "Git & GitHub", issuer: "Crehana", date: "Abr 2025", image: localAssets.certificadoGit },
+      { title: "Desarrollo Personal", issuer: "Alura", date: "Sep 2025", image: localAssets.certificadoDesarrolloPersonal },
+      { title: "Análisis de Datos", issuer: "SENA", date: "Oct 2025", image: localAssets.certificadoAnalisisDatos },
+      { title: "Query Optimization", issuer: "MongoDB University", date: "Insignia", type: 'badge', image: localAssets.badgeQueryOpt },
+      { title: "CRUD Operations", issuer: "MongoDB University", date: "Insignia", type: 'badge', image: localAssets.badgeCrud },
+      { title: "Relational → Document", issuer: "MongoDB University", date: "Insignia", type: 'badge', image: localAssets.badgeRelationalModel },
+      { title: "Building GenAI Apps", issuer: "MongoDB University", date: "Insignia", type: 'badge', image: localAssets.badgeBuildinGenAI },
     ],
     en: [
-      { title: "Programming Basics G9", issuer: "Alura Latam", date: "Sep 2025", image: "assets/certificadoProgramacionPrincipiante.jpg" },
-      { title: "OOP Java Programming", issuer: "Alura Latam", date: "Feb 2026", image: "assets/certificadoJavaPoo.JPG" },
-      { title: "Git & GitHub Mastery", issuer: "Crehana", date: "Apr 2025", image: "assets/certificadoGIT.jpg" },
-      { title: "Personal Development", issuer: "Alura", date: "Sep 2025", image: "assets/certificadoDesarrolloPersonal.jpg" },
-      { title: "Data Analysis", issuer: "SENA", date: "Oct 2025", image: "assets/certificadoAnalisisdeDatos.jpg" },
-      { title: "Query Optimization", issuer: "MongoDB University", date: "Badge", type: 'badge', image: "assets/badgeQueryOpt.png" },
-      { title: "CRUD Operations", issuer: "MongoDB University", date: "Badge", type: 'badge', image: "assets/badgeCrud.png" },
-      { title: "Relational → Document", issuer: "MongoDB University", date: "Badge", type: 'badge', image: "assets/badgeRelationalModel.png" },
-      { title: "Building GenAI Apps", issuer: "MongoDB University", date: "Badge", type: 'badge', image: "assets/badgeBuildinGenAI.png" },
+      { title: "Programming Basics G9", issuer: "Alura Latam", date: "Sep 2025", image: localAssets.certificadoProgramacionPrincipiante },
+      { title: "OOP Java Programming", issuer: "Alura Latam", date: "Feb 2026", image: localAssets.certificadoJavaPoo },
+      { title: "Git & GitHub Mastery", issuer: "Crehana", date: "Apr 2025", image: localAssets.certificadoGit },
+      { title: "Personal Development", issuer: "Alura", date: "Sep 2025", image: localAssets.certificadoDesarrolloPersonal },
+      { title: "Data Analysis", issuer: "SENA", date: "Oct 2025", image: localAssets.certificadoAnalisisDatos },
+      { title: "Query Optimization", issuer: "MongoDB University", date: "Badge", type: 'badge', image: localAssets.badgeQueryOpt },
+      { title: "CRUD Operations", issuer: "MongoDB University", date: "Badge", type: 'badge', image: localAssets.badgeCrud },
+      { title: "Relational → Document", issuer: "MongoDB University", date: "Badge", type: 'badge', image: localAssets.badgeRelationalModel },
+      { title: "Building GenAI Apps", issuer: "MongoDB University", date: "Badge", type: 'badge', image: localAssets.badgeBuildinGenAI },
     ]
   };
 
@@ -598,7 +650,7 @@ export default function App() {
               <div className="space-y-2 mb-12">
                 <p className="terminal-line">$ role</p>
                 <div className="text-lg md:text-2xl font-mono text-gray-400 font-medium min-h-[4rem] md:min-h-0">
-                  {typingText}<span className="cursor ml-1" />
+                  <TypingText text={t.hero.roleText} />
                 </div>
               </div>
 
@@ -640,7 +692,7 @@ export default function App() {
       </section>
 
       {/* Projects Section */}
-      <section id="projects" className="py-24 px-6 max-w-7xl mx-auto">
+      <section id="projects" className="content-visibility-auto py-24 px-6 max-w-7xl mx-auto">
         <SectionTitle icon={Code2}>{t.sections.projects}</SectionTitle>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {t.projectsData.map((project, i) => (
@@ -650,7 +702,7 @@ export default function App() {
       </section>
 
       {/* Experience & Skills */}
-      <section className="py-24 px-6 bg-[#0a0a0a]/50">
+      <section className="content-visibility-auto py-24 px-6 bg-[#0a0a0a]/50">
         <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-20">
           <div id="experience">
             <SectionTitle icon={Briefcase}>{t.sections.experience}</SectionTitle>
@@ -673,7 +725,7 @@ export default function App() {
       </section>
 
       {/* About Section */}
-      <section id="about" className="py-24 px-6 max-w-7xl mx-auto">
+      <section id="about" className="content-visibility-auto py-24 px-6 max-w-7xl mx-auto">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
           <div className="space-y-6">
             <SectionTitle icon={User}>{t.sections.about}</SectionTitle>
@@ -718,18 +770,25 @@ export default function App() {
           </div>
 
           <motion.div 
+            ref={magneticContainerRef}
             initial={{ opacity: 0, scale: 0.9 }}
             whileInView={{ opacity: 1, scale: 1 }}
             viewport={{ once: true }}
             className="flex items-center justify-center p-4"
           >
-            <MagneticFilings />
+            {showMagneticFilings ? (
+              <Suspense fallback={<MagneticFallback />}>
+                <MagneticFilings />
+              </Suspense>
+            ) : (
+              <MagneticFallback />
+            )}
           </motion.div>
         </div>
       </section>
 
       {/* Certifications Section */}
-      <section id="certifications" className="py-24 px-6 max-w-7xl mx-auto">
+      <section id="certifications" className="content-visibility-auto py-24 px-6 max-w-7xl mx-auto">
         <SectionTitle icon={Award}>{t.sections.certifications}</SectionTitle>
         <p className="text-gray-500 mb-12 -mt-8 font-mono text-xs uppercase tracking-widest">{t.sections.certSubtitle}</p>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
@@ -740,7 +799,7 @@ export default function App() {
       </section>
 
       {/* Contact Section */}
-      <section id="contact" className="py-24 px-6 max-w-4xl mx-auto">
+      <section id="contact" className="content-visibility-auto py-24 px-6 max-w-4xl mx-auto">
         <SectionTitle icon={Mail}>{t.sections.contact}</SectionTitle>
         <div className="terminal-card bg-[#0d0d0d] border-violet-500/20 text-left relative overflow-hidden group">
            <div className="absolute top-0 left-0 w-full h-8 bg-white/5 flex items-center px-4 gap-2 border-b border-white/5">
@@ -819,6 +878,8 @@ export default function App() {
                   <img 
                     src={selectedCert.image} 
                     alt={selectedCert.title} 
+                    loading="eager"
+                    decoding="async"
                     className="max-w-full max-h-full object-contain"
                     onError={(e) => {
                       (e.target as HTMLImageElement).src = lang === 'es' ? 'https://placehold.co/600x400/121212/8b5cf6?text=Cargando+Certificado...' : 'https://placehold.co/600x400/121212/8b5cf6?text=Loading+Certificate...';
