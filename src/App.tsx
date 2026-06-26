@@ -544,49 +544,6 @@ export default function App() {
     document.body.removeChild(a);
   }, []);
 
-  const experience = {
-    es: [
-      { 
-        date: "2026 - Actualidad", 
-        role: "Backend Developer", 
-        company: "NOBUGS", 
-        description: ( <ul className="list-disc pl-4 space-y-1"> <li>Desarrollo y mantenimiento utilizando <strong>Spring Boot</strong> y <strong>Supabase</strong>.</li> <li>Refactorización de código, corrección de errores y nuevas funcionalidades.</li> <li>Uso de <strong>Flyway</strong>, despliegues en <strong>AWS</strong> y <strong>Arquitectura Hexagonal</strong>.</li> </ul> ) 
-      },
-      { 
-        date: "Sep 2025 - Nov 2025", 
-        role: "Mentor de Bases de Datos", 
-        company: "Corporación Universitaria Minuto de Dios", 
-        description: ( <p>Tutorías en <strong>MySQL</strong> y <strong>PostgreSQL</strong> enfocadas en modelado, normalización y optimización de consultas.</p> ) 
-      },
-      { 
-        date: "2024 - Actualidad", 
-        role: "Estudiante de Desarrollo de Software", 
-        company: "Corporación Universitaria Minuto de Dios", 
-        description: ( <p>Formación en desarrollo backend, diseño de DBs y APIs REST escalables.</p> ) 
-      }
-    ],
-    en: [
-      { 
-        date: "2026 - Present", 
-        role: "Backend Developer", 
-        company: "NOBUGS", 
-        description: ( <ul className="list-disc pl-4 space-y-1"> <li>Backend development and maintenance using <strong>Spring Boot</strong> and <strong>Supabase</strong>.</li> <li>Code refactoring, bug fixes, and development of new features.</li> <li>Deployments on <strong>AWS</strong>, <strong>Flyway</strong> migration scripts, and <strong>Hexagonal Architecture</strong>.</li> </ul> ) 
-      },
-      { 
-        date: "Sep 2025 - Nov 2025", 
-        role: "Database Mentor", 
-        company: "Corporación Universitaria Minuto de Dios", 
-        description: ( <p>Academic tutoring in <strong>MySQL</strong> and <strong>PostgreSQL</strong> focused on data modeling, normalization, and query optimization.</p> ) 
-      },
-      { 
-        date: "2024 - Present", 
-        role: "Software Development Student", 
-        company: "Corporación Universitaria Minuto de Dios", 
-        description: ( <p>Academic training focused on backend development, robust database design, and scalable RESTful APIs.</p> ) 
-      }
-    ]
-  };
-
   const skillGroups = [
     { category: "Lenguajes", items: [ { name: "JavaScript", level: "Intermediate", icon: "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/javascript/javascript-original.svg" }, { name: "Java", level: "Intermediate", icon: "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/java/java-plain.svg" }, { name: "Python", level: "Beginner", icon: "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/python/python-original.svg" } ] },
     { category: "Frameworks", items: [ { name: "Node.js", level: "Intermediate", icon: "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/nodejs/nodejs-original-wordmark.svg" }, { name: "Spring Boot", level: "Intermediate", icon: "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/spring/spring-original.svg" }, { name: "NextJs", level: "Intermediate", icon: "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/nextjs/nextjs-plain.svg" }, { name: "FastAPI", level: "Beginner", icon: "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/fastapi/fastapi-original.svg" } ] },
@@ -707,7 +664,7 @@ export default function App() {
           <div id="experience">
             <SectionTitle icon={Briefcase}>{t.sections.experience}</SectionTitle>
             <div className="pl-4">
-              {experience[lang].map((exp, i) => (
+              {t.experienceData.map((exp, i) => (
                 <ExperienceItem key={i} exp={exp} index={i} />
               ))}
             </div>
