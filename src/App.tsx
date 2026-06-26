@@ -121,7 +121,7 @@ const translations = {
     ],
     experienceData: [
       { 
-        date: "2026 - Actualidad", 
+        date: "Feb 2026 - Jun 2026", 
         role: "Backend Developer", 
         company: "NOBUGS", 
         description: ( <ul className="list-disc pl-4 space-y-1"> <li>Desarrollo y mantenimiento utilizando <strong>Spring Boot</strong> y <strong>Supabase</strong>.</li> <li>Refactorización de código, corrección de errores y nuevas funcionalidades.</li> <li>Uso de <strong>Flyway</strong>, despliegues en <strong>AWS</strong> y <strong>Arquitectura Hexagonal</strong>.</li> </ul> ) 
@@ -185,7 +185,7 @@ const translations = {
     ],
     experienceData: [
       { 
-        date: "2026 - Present", 
+        date: "Feb 2026 - Jun 2026", 
         role: "Backend Developer", 
         company: "NOBUGS", 
         description: ( <ul className="list-disc pl-4 space-y-1"> <li>Backend development and maintenance using <strong>Spring Boot</strong> and <strong>Supabase</strong>.</li> <li>Code refactoring, bug fixes, and development of new features.</li> <li>Active use of <strong>Flyway</strong>, deployments on <strong>AWS</strong>, and <strong>Hexagonal Architecture</strong>.</li> </ul> ) 
