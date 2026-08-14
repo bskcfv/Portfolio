@@ -14,6 +14,7 @@ import {
   Briefcase, 
   User, 
   Mail, 
+  ExternalLink,
   ChevronRight,
   Terminal as TerminalIcon,
   Award,
@@ -112,11 +113,11 @@ const translations = {
       downloadCv: "Descargar CV"
     },
     projectsData: [
-      { title: "Sync DBs", description: "Sistema de migración híbrido SQL/NoSQL con un motor de sincronización basado en Python.", stack: ["Node.js", "Python", "FastAPI", "PostgreSQL", "MongoDB"], link: "https://github.com/bskcfv/Sync_DBs" },
-      { title: "Hotel Management API", featured: true, description: "Backend modular para operaciones de hoteles con seguridad JWT, validación Zod y reportes automatizados.", stack: ["Node.js", "Express", "PostgreSQL", "JWT", "Swagger"], link: "https://github.com/ProyectoDemet/Backend-DEMET" },
+      { title: "DriveDen", featured: true, description: "API REST backend para registrar y dar seguimiento al historial operativo de vehículos, incluyendo usuarios, autenticación, combustible, kilometraje, reparaciones, recordatorios, suscripciones y procesamiento de voz.", stack: ["Java", "Spring Boot", "PostgreSQL", "JWT", "OpenAI"], productUrl: "https://driveden.online" },
+      { title: "Hotel Management API", featured: true, description: "Backend modular para operaciones de hoteles con seguridad JWT, validación Zod y reportes automatizados.", stack: ["Node.js", "Express", "PostgreSQL", "JWT", "Swagger"], link: "https://github.com/ProyectoDemet/Backend-DEMET", productUrl: "https://clubmetabros.vercel.app" },
       { title: "Perrigry-S", description: "Plataforma de gestión con autenticación por reconocimiento facial, seguimiento de ventas y arquitectura dual SQL/NoSQL.", stack: ["Next.js", "PostgreSQL", "MongoDB", "JWT", "NeonDB"], link: "https://github.com/PerriGry/perrigry-s" },
       { title: "VectorShop", description: "Sistema de búsqueda semántica potenciado por IA que utiliza incrustaciones vectoriales (vector embeddings) para coincidencias basadas en el significado.", stack: ["Node.js", "MongoDB Atlas", "Vector Search", "HuggingFace"], link: "https://github.com/bskcfv/VectorShop" },
-      { title: "Inventory System", description: "Plataforma eficiente de gestión de stock con autenticación JWT y capacidades CRUD completas.", stack: ["Next.js", "Node.js", "MongoDB", "JWT"], link: "https://github.com/bskcfv/InventarioBsk" },
+      { title: "Sync DBs", description: "Sistema de migración híbrido SQL/NoSQL con un motor de sincronización basado en Python.", stack: ["Node.js", "Python", "FastAPI", "PostgreSQL", "MongoDB"], link: "https://github.com/bskcfv/Sync_DBs" },
       { title: "Gario", description: "Backend de finanzas personales para el seguimiento de ingresos y gastos con informes financieros automatizados.", stack: ["Node.js", "Express", "MySQL", "JWT"], link: "https://github.com/60GodlysecondsGroup/Gario_BackEnd" }
     ],
     experienceData: [
@@ -176,11 +177,11 @@ const translations = {
       downloadCv: "Download CV"
     },
     projectsData: [
-      { title: "Sync DBs", description: "Hybrid SQL/NoSQL migration system with a Python-based synchronization engine.", stack: ["Node.js", "Python", "FastAPI", "PostgreSQL", "MongoDB"], link: "https://github.com/bskcfv/Sync_DBs" },
-      { title: "Hotel Management API", featured: true, description: "Modular backend for hotel operations featuring JWT security, Zod validation, and automated reporting.", stack: ["Node.js", "Express", "PostgreSQL", "JWT", "Swagger"], link: "https://github.com/ProyectoDemet/Backend-DEMET" },
+      { title: "DriveDen", featured: true, description: "REST backend API for registering and tracking vehicle operations, including users, authentication, fuel logs, mileage, repairs, maintenance reminders, subscriptions, and voice-entry processing.", stack: ["Java", "Spring Boot", "PostgreSQL", "JWT", "OpenAI"], productUrl: "https://driveden.online" },
+      { title: "Hotel Management API", featured: true, description: "Modular backend for hotel operations featuring JWT security, Zod validation, and automated reporting.", stack: ["Node.js", "Express", "PostgreSQL", "JWT", "Swagger"], link: "https://github.com/ProyectoDemet/Backend-DEMET", productUrl: "https://clubmetabros.vercel.app" },
       { title: "Perrigry-S", description: "Management platform featuring facial recognition auth, sales tracking, and dual SQL/NoSQL architecture.", stack: ["Next.js", "PostgreSQL", "MongoDB", "JWT", "NeonDB"], link: "https://github.com/PerriGry/perrigry-s" },
       { title: "VectorShop", description: "AI-powered semantic search system using vector embeddings for meaning-based query matching.", stack: ["Node.js", "MongoDB Atlas", "Vector Search", "HuggingFace"], link: "https://github.com/bskcfv/VectorShop" },
-      { title: "Inventory System", description: "Efficient stock management platform with JWT authentication and full CRUD capabilities.", stack: ["Next.js", "Node.js", "MongoDB", "JWT"], link: "https://github.com/bskcfv/InventarioBsk" },
+      { title: "Sync DBs", description: "Hybrid SQL/NoSQL migration system with a Python-based synchronization engine.", stack: ["Node.js", "Python", "FastAPI", "PostgreSQL", "MongoDB"], link: "https://github.com/bskcfv/Sync_DBs" },
       { title: "Gario", description: "Personal finance backend for tracking income and expenses with automated financial reporting.", stack: ["Node.js", "Express", "MySQL", "JWT"], link: "https://github.com/60GodlysecondsGroup/Gario_BackEnd" }
     ],
     experienceData: [
@@ -397,15 +398,30 @@ const ProjectCard = memo(({ project, index, lang }: { project: any, index: numbe
       ))}
     </div>
 
-    <a 
-      href={project.link} 
-      target="_blank" 
-      rel="noopener noreferrer"
-      className="inline-flex items-center gap-2 text-sm font-mono text-violet-400 hover:text-white transition-colors mt-auto group/link"
-    >
-      <ChevronRight className="w-4 h-4 group-hover/link:translate-x-1 transition-transform" />
-      {lang === 'es' ? 'Ver Código' : 'View Source'}
-    </a>
+    <div className="flex flex-wrap items-center gap-4 mt-auto">
+      {project.productUrl && (
+        <a
+          href={project.productUrl}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="inline-flex items-center gap-2 text-sm font-mono text-violet-300 hover:text-white transition-colors group/live"
+        >
+          <ExternalLink className="w-4 h-4 group-hover/live:translate-x-0.5 group-hover/live:-translate-y-0.5 transition-transform" />
+          {lang === 'es' ? 'Ver Proyecto' : 'View Project'}
+        </a>
+      )}
+      {project.link && (
+        <a
+          href={project.link}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="inline-flex items-center gap-2 text-sm font-mono text-violet-400 hover:text-white transition-colors group/link"
+        >
+          <ChevronRight className="w-4 h-4 group-hover/link:translate-x-1 transition-transform" />
+          {lang === 'es' ? 'Ver Código' : 'View Source'}
+        </a>
+      )}
+    </div>
   </motion.div>
 ));
 
